@@ -34,10 +34,35 @@
     // which don't have a pending needinfo, and are not in the general and untriaged components
     // this does not include security filtered bugs 
 
+    function buildProductList() {
+        // product list is currently hardcoded into this script
+        var productList = [
+              "Developer Services"
+            , "Release Engineering"
+            , "Infrastructure & Operations"
+            , "Tree Management"
+            , "bugzilla.mozilla.org"
+            , "Bugzilla"
+            , "Testing"
+            , "Taskcluster"
+            , "MozReview"
+            , "Webtools"
+            , "Firefox for Android"
+            , "Conduit"
+        ];
+        var encodedArgs = "";
+        for (let p of productList) {
+            encodedArgs += "&product=" + encodeURIComponent(p);
+        }
+        return encodedArgs;
+    }
+
     function getBugs(last) {
         var newLast;
+        var encodedProductListFragment = buildProductList();
         fetch(baseAPIRequest 
-            + "&product=Core&product=Firefox&product=Firefox%20for%20Android&product=Firefox%20for%20iOS&product=Toolkit&chfieldfrom="
+            + encodedProductListFragment
+            + "&chfieldfrom="
             + "2016-06-01&chfieldto=NOW&v4=" + last)
             .then(function(response) { // $DEITY, I can't wait for await 
                 if (response.ok) {  
