@@ -3,11 +3,36 @@
     var result = { bugs: [] };
     var limit = sizeOfResult = 500;
     var completed = 0;
+    // Bugzilla Products of interest
+    var productList = [
+          "Developer Services"
+        , "Release Engineering"
+        , "Infrastructure & Operations"
+        , "Tree Management"
+        , "bugzilla.mozilla.org"
+        , "Bugzilla"
+        , "Testing"
+        , "Taskcluster"
+        , "MozReview"
+        , "Webtools"
+        , "Firefox for Android"
+        , "Conduit"
+    ];
+    var encodedProductListFragment = buildProductList();
 
     // base bugzilla API query 
     var baseAPIRequest = "https://bugzilla.mozilla.org/rest/bug?include_fields=id,priority,product,component&chfield=[Bug%20creation]&f1=flagtypes.name&f2=component&f3=component&f4=bug_id&o1=notequals&o2=notequals&o3=notequals&o4=greaterthan&resolution=---&v1=needinfo%3F&v2=general&v3=untriaged&email1=intermittent-bug-filer%40mozilla.bugs&emailtype1=notequals&emailreporter1=1&limit=" + limit;
 
     var reportDetailRequest = "https://bugzilla.mozilla.org/buglist.cgi?chfield=[Bug%20creation]&chfieldfrom=2016-06-01&chfieldto=Now&f1=flagtypes.name&f2=component&f3=component&limit=0&o1=notequals&o2=notequals&o3=notequals&resolution=---&v1=needinfo%3F&v2=general&v3=untriaged&email1=intermittent-bug-filer%40mozilla.bugs&emailtype1=notequals&emailreporter1=1";
+
+    // convenience function for building project query string
+    function buildProductList() {
+        var encodedArgs = "";
+        for (let p of productList) {
+            encodedArgs += "&product=" + encodeURIComponent(p);
+        }
+        return encodedArgs;
+    }
 
     // convenience method for making links
     function buglistLink(value, product, component, priority) {
@@ -34,32 +59,9 @@
     // which don't have a pending needinfo, and are not in the general and untriaged components
     // this does not include security filtered bugs 
 
-    function buildProductList() {
-        // product list is currently hardcoded into this script
-        var productList = [
-              "Developer Services"
-            , "Release Engineering"
-            , "Infrastructure & Operations"
-            , "Tree Management"
-            , "bugzilla.mozilla.org"
-            , "Bugzilla"
-            , "Testing"
-            , "Taskcluster"
-            , "MozReview"
-            , "Webtools"
-            , "Firefox for Android"
-            , "Conduit"
-        ];
-        var encodedArgs = "";
-        for (let p of productList) {
-            encodedArgs += "&product=" + encodeURIComponent(p);
-        }
-        return encodedArgs;
-    }
 
     function getBugs(last) {
         var newLast;
-        var encodedProductListFragment = buildProductList();
         fetch(baseAPIRequest 
             + encodedProductListFragment
             + "&chfieldfrom="
